@@ -11,5 +11,6 @@ service ChatService {
     rpc SayHello(Message) returns (Message) {}
 }
 
-//protoc --go_out=plugins=grpc:. chat/chat.proto 
+
+// protoc --go_out=plugins=grpc:chat chat.proto
 

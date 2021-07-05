@@ -19,7 +19,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 type App struct {
 	Router *mux.Router	
 	HttpServer *http.Server
-	GrpcServer grpc.Server
+	GrpcServer *grpc.Server
 }
 
 func (a *App) Initialize () {		
@@ -35,26 +35,34 @@ func (a *App) RunApp(port string){
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}	
+	fmt.Println("[x] starting app")
 	log.Fatal(a.HttpServer.ListenAndServe())	
 	
 }
 
 func (a *App) InitGrpcServer(){
-	lis, err := net.Listen("tcp", ":9000")
+	fmt.Println("[x] Go gRPC Beginners Tutorial!")
+
+	lis, err := net.Listen("tcp", ":9000")	
+	
 	if err != nil {
 		log.Fatalf("Failed to listen on port 9000: %v", err)
 	}
-	grpcServer := grpc.NewServer()
-	if err := grpcServer.Serve(lis); err!=nil {
-		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)
-	}
+
+	a.GrpcServer = grpc.NewServer()
+	
+	if err := a.GrpcServer.Serve(lis); err!=nil {
+		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)		
+	}	
 }
 
 func main() {	
 	myApp := App{}
-	myApp.Initialize()
-	myApp.RunApp("9001")
+	//myApp.Initialize()
+	//myApp.RunApp("9001")
 	myApp.InitGrpcServer()
+	
+	
 }
 
 //https://tutorialedge.net/golang/go-grpc-beginners-tutorial/

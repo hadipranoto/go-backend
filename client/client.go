@@ -18,13 +18,15 @@ func main(){
 	defer conn.Close()
 
 	c := chat.NewChatServiceClient(conn)
+
 	message := chat.Message{
 		Body: "Hellow from the client!",
 	}
 
 	response, err := c.SayHello(context.Background(), &message)
+	
 	if err!=nil {
-		log.Fatalf("error when calling sayhello: %s",err)
+		log.Fatalf("error when calling say hello: %s",err)
 	}
 	log.Printf("Response from the server: %s",response.Body)
 }
