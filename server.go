@@ -52,8 +52,8 @@ func (a *App) InitGrpcServer(){
 
 func main() {	
 	myApp := App{}
-	//myApp.Initialize()
-	//myApp.RunApp("9001")
+	myApp.Initialize()
+	myApp.RunApp("9001")
 	myApp.InitGrpcServer()
 }
 
