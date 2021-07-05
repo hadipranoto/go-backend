@@ -4,8 +4,12 @@
 package chat
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -77,4 +81,84 @@ var fileDescriptor_767a49518b351716 = []byte{
 	0x9a, 0x93, 0x93, 0x2f, 0xc4, 0xab, 0x07, 0x36, 0x0c, 0xaa, 0x5b, 0x0a, 0x95, 0xab, 0xc4, 0x90,
 	0xc4, 0x06, 0xb6, 0xc6, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x46, 0xce, 0xdd, 0xaf, 0x79, 0x00,
 	0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConnInterface
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion6
+
+// ChatServiceClient is the client API for ChatService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ChatServiceClient interface {
+	SayHello(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
+}
+
+type chatServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewChatServiceClient(cc grpc.ClientConnInterface) ChatServiceClient {
+	return &chatServiceClient{cc}
+}
+
+func (c *chatServiceClient) SayHello(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/chat.ChatService/SayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ChatServiceServer is the server API for ChatService service.
+type ChatServiceServer interface {
+	SayHello(context.Context, *Message) (*Message, error)
+}
+
+// UnimplementedChatServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedChatServiceServer struct {
+}
+
+func (*UnimplementedChatServiceServer) SayHello(ctx context.Context, req *Message) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+
+func RegisterChatServiceServer(s *grpc.Server, srv ChatServiceServer) {
+	s.RegisterService(&_ChatService_serviceDesc, srv)
+}
+
+func _ChatService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Message)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).SayHello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat.ChatService/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).SayHello(ctx, req.(*Message))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _ChatService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "chat.ChatService",
+	HandlerType: (*ChatServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SayHello",
+			Handler:    _ChatService_SayHello_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "chat/chat.proto",
 }
