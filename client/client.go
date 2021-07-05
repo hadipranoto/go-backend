@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/tutorialedge/go-grpc-tutorial/chat"
+	"github.com/hadipranoto/go-backend/chat"
 	"google.golang.org/grpc"
 )
 
