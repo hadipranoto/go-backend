@@ -18,31 +18,27 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there!")
 }
 
-type App struct {
-	Router *mux.Router	
+type App struct {	
 	HttpServer *http.Server
 	GrpcServer *grpc.Server
 }
 
-func (a *App) Initialize () {		
-	a.Router = mux.NewRouter();
-	a.Router.HandleFunc("/", handler)		
-}
 
-func (a *App) RunApp(port string){
-		
-	a.HttpServer = &http.Server{
-		Handler:      a.Router,
-		Addr:         fmt.Sprintf("127.0.0.1:%s",port),
+func RunApp(app App){
+	router := mux.NewRouter();
+	router.HandleFunc("/", handler)			
+	app.HttpServer = &http.Server{
+		Handler:      router,
+		Addr:         fmt.Sprintf("127.0.0.1:%s","9001"),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}	
 	fmt.Println("[x] starting app")
-	log.Fatal(a.HttpServer.ListenAndServe())	
+	log.Fatal(app.HttpServer.ListenAndServe())	
 	
 }
 
-func (a *App) InitGrpcServer(){
+func InitGrpcServer(app App){
 	fmt.Println("[x] Go gRPC Beginners Tutorial!")
 
 	lis, err := net.Listen("tcp", ":9000")	
@@ -51,20 +47,25 @@ func (a *App) InitGrpcServer(){
 		log.Fatalf("Failed to listen on port 9000: %v", err)
 	}
 
-	a.GrpcServer = grpc.NewServer()
+	app.GrpcServer = grpc.NewServer()
 	s := chat.Server{}
-	chat.RegisterChatServiceServer(a.GrpcServer, &s)
+	chat.RegisterChatServiceServer(app.GrpcServer, &s)
 	
-	if err := a.GrpcServer.Serve(lis); err!=nil {
+	if err := app.GrpcServer.Serve(lis); err!=nil {
 		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)		
 	}	
 }
 
 func main() {	
+	
 	myApp := App{}
-	//myApp.Initialize()
-	//myApp.RunApp("9001")
-	myApp.InitGrpcServer()
+	
+	//lol its tricky but it works hahaha
+	go func ()  {
+		RunApp(myApp)	
+	}()	
+	
+	InitGrpcServer(myApp)
 	
 	
 }
