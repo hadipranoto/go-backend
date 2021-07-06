@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/hadipranoto/go-backend.git/chat"
+
 	"google.golang.org/grpc"
 )
 
@@ -50,6 +52,8 @@ func (a *App) InitGrpcServer(){
 	}
 
 	a.GrpcServer = grpc.NewServer()
+	s := chat.Server{}
+	chat.RegisterChatServiceServer(a.GrpcServer, &s)
 	
 	if err := a.GrpcServer.Serve(lis); err!=nil {
 		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)		
